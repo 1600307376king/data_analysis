@@ -1,0 +1,9 @@
+six
+asgiref==3.2.3
+Django==3.0.2
+Jinja2==2.10.3
+MarkupSafe==1.1.1
+psutil==5.6.7
+PyMySQL==0.9.3
+pytz==2019.3
+sqlparse==0.3.0

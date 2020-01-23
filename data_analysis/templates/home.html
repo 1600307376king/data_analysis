@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" href="{% static 'images/icon/favicon.ico' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/diy/home.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <style>
+        .inner-box a {
+            text-decoration: none;
+        }
+
+        .show-data {
+            position: fixed;
+            top: 600px;
+            left: 400px;
+            width: 100px;
+            height: 100px;
+            background: yellow;
+            color: #0f0f0f;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-area">
+        <div class="top-logo">DashBoard</div>
+        <div class="person-info">
+            <img src="{% static 'images/avatar/avatar-2.png' %}" alt="">
+            <span>HelloWorld</span>
+        </div>
+    </div>
+    <div class="nav-menu">
+        <div class="inner-box">
+            <ul class="nav-ul">
+                <li class="menu-selection">Main</li>
+                <li>
+                    <div class="inner-li">
+                        <a>
+                            <i class="glyphicon glyphicon-th-large"></i>
+                            <span class="title">Dashboard</span>
+                            <span class="arrow open"><i id="menuIcon" class="glyphicon glyphicon-menu-left"></i></span>
+                        </a>
+                    </div>
+                    <ul class="sub-menu">
+                        <li><a href="#"><span>Login</span></a></li>
+                        <li><a href="#"><span>Registration</span></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="inner-li">
+                        <a>
+                            <i class="glyphicon glyphicon-film"></i>
+                            <span>Access Pages</span>
+                            <span class="arrow open"><i id="menuIcon" class="glyphicon glyphicon-menu-left"></i></span>
+                        </a>
+                    </div>
+                    <ul class="sub-menu">
+                        <li><a href="#"><span>Login</span></a></li>
+                        <li><a href="#"><span>Registration</span></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="inner-li">
+                        <a>
+                            <i class="glyphicon glyphicon-music"></i>
+                            <span>Layout</span>
+                            <span class="arrow open"><i id="menuIcon" class="glyphicon glyphicon-menu-left"></i></span>
+                        </a>
+                    </div>
+                    <ul class="sub-menu">
+                        <li><a href="#"><span>Login</span></a></li>
+                        <li><a href="#"><span>Registration</span></a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-selection">Applications</li>
+                <li>
+                    <div class="inner-li">
+                        <a>
+                            <i class="glyphicon glyphicon-envelope"></i>
+                            <span>Calender</span>
+                            <span class="arrow open"><i id="menuIcon" class="glyphicon glyphicon-menu-left"></i></span>
+                        </a>
+                    </div>
+                    <ul class="sub-menu">
+                        <li><a href="#"><span>Login</span></a></li>
+                        <li><a href="#"><span>Registration</span></a></li>
+                    </ul>
+                </li>
+
+                <li>
+                    <div class="inner-li">
+                        <a>
+                            <i class="glyphicon glyphicon-pencil"></i>
+                            <span>Mailbox</span>
+                            <span class="arrow open"><i id="menuIcon" class="glyphicon glyphicon-menu-left"></i></span>
+                        </a>
+                    </div>
+                    <ul class="sub-menu">
+                        <li><a href="#"><span>Login</span></a></li>
+                        <li><a href="#"><span>Registration</span></a></li>
+                    </ul>
+                </li>
+
+                <li>
+                    <div class="inner-li">
+                        <a>
+                            <i class="glyphicon glyphicon-signal"></i>
+                            <span>chat api</span>
+                            <span class="arrow open"><i id="menuIcon" class="glyphicon glyphicon-menu-left"></i></span>
+                        </a>
+                    </div>
+                    <ul class="sub-menu">
+                        <li><a href="#"><span>Login</span></a></li>
+                        <li><a href="#"><span>Registration</span></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="main" class="main">
+        <div class="home-box">
+            <div class="row">
+                <div class="col-xs-4">
+                    <div id="cpuInfo" class="cpu-info"></div>
+                </div>
+                <div class="col-xs-4">
+                    <div id="memoryInfo" class="memory-info"></div>
+                </div>
+                <div class="col-xs-4">
+                    <div id="diskInfo" class="disk-info"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{#    <div class="show-data">#}
+{#        {{ cpu.cpu_utilization }}#}
+{#    </div>#}
+</body>
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/home.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'js/echarts.min.js' %}"></script>
+
+
+<script type="text/javascript">
+    let cpuData = [];
+    let memoryData = [];
+    let diskReadData = [];
+    let diskWriteData = [];
+    let currentTime = [];
+
+    let cpuChart = echarts.init(document.getElementById("cpuInfo"));
+    let cpuOption = {
+        title:{
+            text:'cpu 数据监控'
+        },
+        tooltip:{},
+        legend:{
+            data:['用户来源']
+        },
+        xAxis:{
+            data:currentTime,
+        },
+        yAxis:{
+
+        },
+        series:[{
+            name:'访问量',
+            type:'line',
+            data:cpuData,
+        }]
+    };
+
+    let memoryChart = echarts.init(document.getElementById("memoryInfo"));
+    let memoryOption = {
+        title:{
+            text:'内存 数据监控'
+        },
+        tooltip:{},
+        legend:{
+            data:['用户来源']
+        },
+        xAxis:{
+            data:currentTime,
+        },
+        yAxis:{
+
+        },
+        series:[{
+            name:'访问量',
+            type:'line',
+            data:memoryData,
+        }]
+    };
+
+    let diskChart = echarts.init(document.getElementById("diskInfo"));
+    let diskOption = {
+        title:{
+            text:'磁盘数据监控'
+        },
+        tooltip:{},
+        legend:{
+            data:['用户来源']
+        },
+        xAxis:{
+            data:currentTime,
+        },
+        yAxis:{
+
+        },
+        series:[{
+            name:'访问量',
+            type:'line',
+            data:diskReadData,
+        }]
+    };
+
+    setInterval(function () {
+        getSystemInfo();
+    }, 1000);
+
+    function getSystemInfo() {
+        $.ajax({
+            type: "GET",
+            url: "/system",
+
+            dataType: "json",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            success: function (response) {
+
+                cpuData.push(response.cpu);
+                memoryData.push(response.memory);
+                diskReadData.push(response.disk_read);
+                diskWriteData.push(response.disk_write);
+                currentTime.push(response.cur_time);
+                if(cpuData.length > 4){
+                    cpuData.shift();
+                }
+                if(memoryData.length > 4){
+                    memoryData.shift();
+                }
+                if(diskReadData.length > 4){
+                    diskReadData.shift();
+                }
+                if(diskWriteData.length > 4){
+                    diskWriteData.shift();
+                }
+                if(currentTime.length > 4){
+                    currentTime.shift();
+                }
+
+                cpuChart.setOption(cpuOption);
+                memoryChart.setOption(memoryOption);
+                diskChart.setOption(diskOption);
+            }
+        })
+    }
+
+</script>
+</html>
