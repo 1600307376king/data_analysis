@@ -176,29 +176,33 @@ body {
     border-radius: 5px;
     padding: 10px;
     -webkit-box-shadow: 0 0 10px 0 rgba(33,33,33,.2);
-
     float: left;
 }
 
 .memory-info {
     width: 90%;
     height: 300px;
-
     border-radius: 5px;
     padding: 10px;
     -webkit-box-shadow: 0 0 10px 0 rgba(33,33,33,.2);
-
     float: left;
 }
 
 .disk-info {
     width: 90%;
     height: 300px;
-
     border-radius: 5px;
     padding: 10px;
     -webkit-box-shadow: 0 0 10px 0 rgba(33,33,33,.2);
+    float: left;
+}
 
+.net-info {
+    width: 90%;
+    height: 300px;
+    border-radius: 5px;
+    padding: 10px;
+    -webkit-box-shadow: 0 0 10px 0 rgba(33,33,33,.2);
     float: left;
 }
 

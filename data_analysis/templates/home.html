@@ -22,6 +22,8 @@
             background: yellow;
             color: #0f0f0f;
         }
+
+
     </style>
 </head>
 <body>
@@ -123,15 +125,21 @@
     </div>
     <div id="main" class="main">
         <div class="home-box">
-            <div class="row">
-                <div class="col-xs-4">
+            <div class="row" style="margin-bottom: 20px">
+                <div class="col-xs-6">
                     <div id="cpuInfo" class="cpu-info"></div>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <div id="memoryInfo" class="memory-info"></div>
                 </div>
-                <div class="col-xs-4">
+
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
                     <div id="diskInfo" class="disk-info"></div>
+                </div>
+                <div class="col-xs-6">
+                    <div id="netInfo" class="net-info"></div>
                 </div>
             </div>
         </div>
@@ -152,6 +160,8 @@
     let memoryData = [];
     let diskReadData = [];
     let diskWriteData = [];
+    let netSentData = [];
+    let netRecvData = [];
     let currentTime = [];
 
     let cpuChart = echarts.init(document.getElementById("cpuInfo"));
@@ -164,7 +174,7 @@
             data:['用户来源']
         },
         xAxis:{
-            data:currentTime,
+            data: currentTime,
         },
         yAxis:{
 
@@ -172,14 +182,14 @@
         series:[{
             name:'访问量',
             type:'line',
-            data:cpuData,
+            data: cpuData,
         }]
     };
 
     let memoryChart = echarts.init(document.getElementById("memoryInfo"));
     let memoryOption = {
         title:{
-            text:'内存 数据监控'
+            text:'内存数据监控'
         },
         tooltip:{},
         legend:{
@@ -192,9 +202,9 @@
 
         },
         series:[{
-            name:'访问量',
-            type:'line',
-            data:memoryData,
+            name: '访问量',
+            type: 'line',
+            data: memoryData,
         }]
     };
 
@@ -205,7 +215,7 @@
         },
         tooltip:{},
         legend:{
-            data:['用户来源']
+            data:['磁盘读取速度', '磁盘写入速度']
         },
         xAxis:{
             data:currentTime,
@@ -213,17 +223,90 @@
         yAxis:{
 
         },
-        series:[{
-            name:'访问量',
-            type:'line',
-            data:diskReadData,
-        }]
+        series:[
+            {
+                name: '磁盘读取速度',
+                type: 'line',
+                data: diskReadData,
+            },
+            {
+                name: '磁盘写入速度',
+                type: 'line',
+                data: diskWriteData,
+            }
+        ]
     };
+
+    let netChart = echarts.init(document.getElementById("netInfo"));
+    let netOption = {
+        title:{
+            text:'网络数据监控'
+        },
+        tooltip:{},
+        legend:{
+            data:['发送速度', '接受速度']
+        },
+        xAxis:{
+            data:currentTime,
+        },
+        yAxis:{
+
+        },
+        series:[
+            {
+                name: '发送速度',
+                type: 'line',
+                data: netSentData,
+            },
+            {
+                name: '接受速度',
+                type: 'line',
+                data: netRecvData,
+            }
+        ]
+    };
+
+
+    cpuChart.showLoading();
+    memoryChart.showLoading();
+    diskChart.showLoading();
+    netChart.showLoading();
+
+    $.ajax({
+        type: "GET",
+        url: "/fs",
+        dataType: "json",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        success: function (response) {
+            cpuChart.hideLoading();
+            memoryChart.hideLoading();
+            diskChart.hideLoading();
+            netChart.hideLoading();
+
+            for(let i=0; i<response.cpu.length; i++){
+                cpuData.push(response.cpu[i]);
+                memoryData.push(response.memory[i]);
+                diskReadData.push(response.disk_r[i]);
+                diskWriteData.push(response.disk_w[i]);
+                netSentData.push(response.net_s[i]);
+                netRecvData.push(response.net_r[i]);
+
+            }
+            for(let j=0; j<response.cur_t.length; j++){
+                currentTime.push(response.cur_t[j]);
+            }
+            cpuChart.setOption(cpuOption);
+            memoryChart.setOption(memoryOption);
+            diskChart.setOption(diskOption);
+            netChart.setOption(netOption);
+        }
+    });
 
     setInterval(function () {
         getSystemInfo();
-    }, 1000);
-
+    }, 2000);
     function getSystemInfo() {
         $.ajax({
             type: "GET",
@@ -234,12 +317,14 @@
                 'Content-Type': 'application/json',
             },
             success: function (response) {
-
                 cpuData.push(response.cpu);
                 memoryData.push(response.memory);
-                diskReadData.push(response.disk_read);
-                diskWriteData.push(response.disk_write);
-                currentTime.push(response.cur_time);
+                diskReadData.push(response.disk_r);
+                diskWriteData.push(response.disk_w);
+                netSentData.push(response.net_s);
+                netRecvData.push(response.net_r);
+                currentTime.push(response.cur_t);
+
                 if(cpuData.length > 4){
                     cpuData.shift();
                 }
@@ -252,13 +337,19 @@
                 if(diskWriteData.length > 4){
                     diskWriteData.shift();
                 }
+                if(netSentData.length > 4){
+                    netSentData.shift();
+                }
+                if(netRecvData.length > 4){
+                    netRecvData.shift();
+                }
                 if(currentTime.length > 4){
                     currentTime.shift();
                 }
-
                 cpuChart.setOption(cpuOption);
                 memoryChart.setOption(memoryOption);
                 diskChart.setOption(diskOption);
+                netChart.setOption(netOption);
             }
         })
     }

@@ -20,7 +20,8 @@ from data.views import common
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', common.home),
-    path('add/', common.add_latest_cpu_info),
+    path('add/', common.add_latest_info),
     path('test/', common.test),
     path('system/', common.get_system_info),
+    path('fs/', common.get_first_system_info)
 ]

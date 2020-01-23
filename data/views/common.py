@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from data.models.common import CpuInfo
+from data.models.common import CpuInfo, MemoryInfo, SolidStateDisk, NetInfo
+from data.tool.add_data import *
 import platform
 import psutil
 import datetime
@@ -11,25 +12,9 @@ import json
 
 
 def home(request):
-    cpu_obj = CpuInfo.objects.all()
-    # print(cpu_obj[0].update_time)
-    # print(type(cpu_obj[0].update_time))
-    # print(cpu_obj[0].name)
-    # cur_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     context = {
-        'cpu': {'cpu_utilization': psutil.cpu_percent()},
-        'memory': '666',
-        'disk': '777',
+
     }
-    print(datetime.datetime.now().strftime('%H:%M:%S'))
-    print(cpu_obj[0].update_time.strftime('%H:%M:%S'))
-    # system_info = dict()
-    # system_info['cpu'] = {
-    #     'cpu_utilization': psutil.cpu_percent(),
-    # }
-    # system_info['memory'] = '666'
-    # system_info['disk'] = ''
-    # print(system_info['cpu'])
     return render(request, 'home.html', context)
 
 
@@ -40,6 +25,28 @@ def test(request):
     return render(request, 'test.html', context)
 
 
+# 单次获取数据库系统数据
+def get_first_system_info(request):
+    latest_num = 4
+    cpu_obj = CpuInfo.objects.order_by('update_time')[:latest_num]
+    memory_obj = MemoryInfo.objects.order_by('update_time')[:latest_num]
+    disk_obj = SolidStateDisk.objects.order_by('update_time')[:latest_num]
+    network_obj = NetInfo.objects.order_by('update_time')[:latest_num]
+    res = {
+        'cpu': [i.utilization for i in cpu_obj],
+        'memory': [i.memory_percent for i in memory_obj],
+        'disk_r': [i.read_speed for i in disk_obj],
+        'disk_w': [i.write_speed for i in disk_obj],
+        'net_s': [i.bytes_sent for i in network_obj],
+        'net_r': [i.bytes_recv for i in network_obj],
+        'cur_t': [(datetime.datetime.now() - datetime.timedelta(seconds=i)).strftime('%H:%M:%S')
+                  for i in range(latest_num).__reversed__()],
+    }
+
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+# 前端定时请求获取数据
 def get_system_info(request):
     cpu_utilization = psutil.cpu_percent()
     memory_used_rate = psutil.virtual_memory().used / psutil.virtual_memory().total * 100
@@ -47,26 +54,30 @@ def get_system_info(request):
                        psutil.disk_io_counters().read_time) / 1024 ** 2
     disk_write_speed = (psutil.disk_io_counters().write_bytes /
                         psutil.disk_io_counters().write_time) / 1024 ** 2
+    bytes_sent = int(psutil.net_io_counters().bytes_sent / 1024)
+    bytes_recv = int(psutil.net_io_counters().bytes_recv / 1024)
     cur_time = datetime.datetime.now().strftime('%H:%M:%S')
 
     res = {
         'cpu': cpu_utilization,
         'memory': memory_used_rate,
-        'disk_read': disk_read_speed,
-        'disk_write': disk_write_speed,
-        'cur_time': cur_time
+        'disk_r': disk_read_speed,
+        'disk_w': disk_write_speed,
+        'net_s': bytes_sent,
+        'net_r': bytes_recv,
+        'cur_t': cur_time
     }
 
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
-def add_latest_cpu_info(request):
-    cpu_info = platform.processor()
-    physics_cores = psutil.cpu_count(logical=False)
-    logical_processors = psutil.cpu_count()
-    turbo = psutil.cpu_freq().max
-    cpu_utilization = psutil.cpu_percent()
-    cur_frequency = psutil.cpu_freq().current
-    CpuInfo.objects.create(name=cpu_info, physics_cores=physics_cores, logical_processors=logical_processors,
-                           turbo=turbo, utilization=cpu_utilization, cur_frequency=cur_frequency)
-    return HttpResponse('add_ok')
+def add_latest_info(request):
+    try:
+        add_latest_cpu_info()
+        add_latest_disk_info()
+        add_latest_memory_info()
+        add_latest_net_info()
+        return HttpResponse('add_ok')
+    except Exception as e:
+        print(e)
+        return HttpResponse('add_error')
