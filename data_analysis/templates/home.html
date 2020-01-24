@@ -280,11 +280,6 @@
             'Content-Type': 'application/json',
         },
         success: function (response) {
-            cpuChart.hideLoading();
-            memoryChart.hideLoading();
-            diskChart.hideLoading();
-            netChart.hideLoading();
-
             for(let i=0; i<response.cpu.length; i++){
                 cpuData.push(response.cpu[i]);
                 memoryData.push(response.memory[i]);
@@ -301,6 +296,12 @@
             memoryChart.setOption(memoryOption);
             diskChart.setOption(diskOption);
             netChart.setOption(netOption);
+        },
+        complete: function () {
+            cpuChart.hideLoading();
+            memoryChart.hideLoading();
+            diskChart.hideLoading();
+            netChart.hideLoading();
         }
     });
 
