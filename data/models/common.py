@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-import datetime
 
 # Create your models here.
 # cur_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -13,11 +12,12 @@ class CpuInfo(models.Model):
     turbo = models.FloatField(default=0, verbose_name='cpu睿频')
     utilization = models.FloatField(default=0, verbose_name='cpu占用率')
     cur_frequency = models.FloatField(default=0, verbose_name='cpu当前频率')
-    update_time = models.DateTimeField('更新时间', default=timezone.now())
+    update_time = models.DateTimeField('更新时间', default=timezone.now)
 
     class Meta:
         verbose_name = 'cpu'
         verbose_name_plural = 'cpu'
+        ordering = ['id']
 
     def __str__(self):
         return self.name
@@ -32,6 +32,8 @@ class MemoryInfo(models.Model):
 
     # def __str__(self):
     #     return self.name
+    class Meta:
+        ordering = ['id']
 
 
 class SolidStateDisk(models.Model):
@@ -40,6 +42,9 @@ class SolidStateDisk(models.Model):
     read_speed = models.FloatField(default=0, verbose_name='读取速度')
     write_speed = models.FloatField(default=0, verbose_name='写入速度')
     update_time = models.DateTimeField('更新时间', auto_now=True)
+    #
+    # class Meta:
+    #     ordering = ['id']
 
     def __str__(self):
         return self.name
@@ -50,5 +55,13 @@ class NetInfo(models.Model):
     bytes_recv = models.FloatField(default=0, verbose_name='接受')
     update_time = models.DateTimeField('更新时间', auto_now=True)
 
+    class Meta:
+        ordering = ['id']
 
 
+class MyUser(models.Model):
+    name = models.CharField('用户名', max_length=50)
+    password = models.CharField('密码', max_length=10)
+
+    class Meta:
+        ordering = ['id']

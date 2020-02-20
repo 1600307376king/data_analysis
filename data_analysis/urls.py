@@ -15,13 +15,39 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from data.views import common
+from django.conf.urls import url, include
+from data.views.views import *
+from rest_framework import routers
+from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework.authtoken import views
+
+router = routers.DefaultRouter()
+# router.register(r'md', common.ModuleNameList, basename='md')
+router.register(r'cpu', CpuMessageSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', common.home),
-    path('add/', common.add_latest_info),
-    path('test/', common.test),
-    path('system/', common.get_system_info),
-    path('fs/', common.get_first_system_info)
+    #
+    # path('add/', common.add_latest_info),
+    path('system/', get_system_info),
+    path('fs/', get_first_system_info),
+    # path('index/', common.index),
+    path('home/', home),
+    url(r'^', include(router.urls)),
+    url(r'^api-auth/', include('rest_framework.urls')),
+    url(r'^api-token-auth/', views.obtain_auth_token),
+    url(r'^memory/$', memory_list),
+    path('memory/<int:pk>/', memory_control),
+    url(r'^ssd/$', SolidStateDiskList.as_view()),
+    url(r'^ssd/(?P<pk>[0-9]+)/$', SolidStateControl.as_view()),
+    url(r'^net/$', NetList.as_view()),
+    url(r'^net/(?P<pk>[0-9]+)/$', NetControl.as_view()),
+    url(r'^net2/$', NetToList.as_view()),
+    url(r'^net2/(?P<pk>[0-9]+)/$', NetToControl.as_view()),
+    url(r'^user/$', MyUserList.as_view()),
+    url(r'^user/(?P<pk>[0-9]+)/$', MyUserControl.as_view()),
+    url(r'^sys/$', SystemInfoList.as_view()),
 ]
+
+
+# urlpatterns = format_suffix_patterns(urlpatterns)

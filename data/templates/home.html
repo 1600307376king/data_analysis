@@ -274,24 +274,21 @@
 
     $.ajax({
         type: "GET",
-        url: "/fs",
+        url: "/memory/",
         dataType: "json",
         headers: {
             'Content-Type': 'application/json',
         },
         success: function (response) {
-            for(let i=0; i<response.cpu.length; i++){
-                cpuData.push(response.cpu[i]);
-                memoryData.push(response.memory[i]);
-                diskReadData.push(response.disk_r[i]);
-                diskWriteData.push(response.disk_w[i]);
-                netSentData.push(response.net_s[i]);
-                netRecvData.push(response.net_r[i]);
 
-            }
-            for(let j=0; j<response.cur_t.length; j++){
-                currentTime.push(response.cur_t[j]);
-            }
+            cpuData.push(response.data.utilization);
+            memoryData.push(response.data.memory_percent);
+            diskReadData.push(response.data.read_speed);
+            diskWriteData.push(response.data.write_speed);
+            netSentData.push(response.data.bytes_sent);
+            netRecvData.push(response.data.bytes_recv);
+            currentTime.push(response.data.update_time);
+
             cpuChart.setOption(cpuOption);
             memoryChart.setOption(memoryOption);
             diskChart.setOption(diskOption);
@@ -311,20 +308,20 @@
     function getSystemInfo() {
         $.ajax({
             type: "GET",
-            url: "/system",
+            url: "/memory/",
 
             dataType: "json",
             headers: {
                 'Content-Type': 'application/json',
             },
             success: function (response) {
-                cpuData.push(response.cpu);
-                memoryData.push(response.memory);
-                diskReadData.push(response.disk_r);
-                diskWriteData.push(response.disk_w);
-                netSentData.push(response.net_s);
-                netRecvData.push(response.net_r);
-                currentTime.push(response.cur_t);
+                cpuData.push(response.data.utilization);
+                memoryData.push(response.data.memory_percent);
+                diskReadData.push(response.data.read_speed);
+                diskWriteData.push(response.data.write_speed);
+                netSentData.push(response.data.bytes_sent);
+                netRecvData.push(response.data.bytes_recv);
+                currentTime.push(response.data.update_time);
 
                 if(cpuData.length > 4){
                     cpuData.shift();
